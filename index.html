@@ -469,6 +469,7 @@
                 <h3>伯宣 & 毓晴</h3>
                 <p>♡ 請開啟聲音，瀏覽更加分 ♡</p>
 
+                <p id="loadingText">載入中...</p>
                 <button id="enterBtn" class="btn" disabled>
                     <span class="btn-text">▸</span>
                 </button>
@@ -530,7 +531,10 @@
             const btnText = btn.querySelector('.btn-text');
             const overlay = document.getElementById('introOverlay');
             const music = document.getElementById('bgMusic');
+            const loadingText = document.getElementById('loadingText');
 
+            // 讓「載入中」淡出
+            loadingText.classList.add('hide');
             // 網站完全載入後啟用按鈕
             btn.disabled = false;
             btnText.textContent = "▸";

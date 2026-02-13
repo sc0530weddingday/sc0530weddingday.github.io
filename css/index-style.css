@@ -65,6 +65,16 @@
     font-weight: 300;
 }
 
+
+#loadingText {
+    transition: opacity 0.2s ease-in-out;
+
+}
+
+#loadingText.hide {
+    display: none;
+}
+
 #enterBtn .btn-text {
     font-size: 30px;
     font-weight: bolder;
@@ -79,15 +89,22 @@
     border: 2px solid #3e5477;
     color: #3e5477;
     cursor: pointer;
-    display: inline-flex;
+    display: none;
     justify-content: center;
     align-items: center;
     background-color: transparent;
     transition: all 0.2s ease-in-out;
 }
 
+#enterBtn.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
 /* 呼吸動畫 */
 #enterBtn.active {
+    display: inline-flex;
     animation: pulse 1.8s infinite ease-in-out;
 }
 

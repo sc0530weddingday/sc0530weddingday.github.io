@@ -215,7 +215,6 @@ html {
 
 .logo {
     width: 80px;
-    background-image: url("../img/logo.webp");
     background-repeat: no-repeat;
     background-size: 100%;
     overflow: hidden;
