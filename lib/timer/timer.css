@@ -1,0 +1,13 @@
+.timebox {
+    display: flex;
+    gap: 90px;
+}
+
+.time {
+    text-align: center;
+}
+
+.time h2 {
+    font-size: 5rem;
+    font-weight: 100;
+}

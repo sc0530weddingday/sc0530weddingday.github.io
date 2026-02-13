@@ -1,0 +1,51 @@
+<div id="menuCart">
+    <input class="form-check" type="checkbox" id="phoneProduct">
+
+    <header class="navbar navbar-expand-xl fixed-top nav-bg pt-2 pb-3 py-xl-0 px-xl-3">
+        <div class="container-xl">
+
+            <a class="logo-item order-1" href="index-v2.html">
+                <div class="logo">
+                    <h1>Sean & Cindy 0530 WaddingDay</h1>
+                </div>
+            </a>
+
+
+
+            <ul
+                class="navbar-nav icon-nav flex-row flex-md-col align-items-center d-flex order-2 order-xl-3 ps-0 ps-lg-5">
+                <li>
+                    <label class="dropdown-btn size-right" for="phoneProduct">
+                        <i class="fa-solid fa-bars"></i>
+
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="phone-item" id="navMenu">
+        <div class="container-fluid">
+            <label class="close-title" for="phoneProduct"><i class="fa-solid fa-arrow-left"></i></label>
+            <ul class="phone-nav">
+                <li><a href="#invite">誠摯邀請</a></li>
+                <li><a href="#invitation">賓客回函</a></li>
+                <li><a href="#dressCode">服裝建議</a></li>
+                <li><a href="#commuting">交通方式</a></li>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<script>
+    document.querySelectorAll('.phone-item a').forEach(link => {
+        link.addEventListener('click', function () {
+
+            // 取消 checkbox 勾選
+            document.getElementById('phoneProduct').checked = false;
+
+        });
+    });
+</script>
+<script src="lib/sweetalert/sweetalert.min.js"></script>
