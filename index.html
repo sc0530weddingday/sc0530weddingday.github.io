@@ -220,7 +220,7 @@
                         <div class="item">
                             <img src="img/9.webp" alt="">
                             <p>氣溫10度拍的婚紗<br>
-                                婚姻迎來的第一個考驗</p>
+                                這應該是婚姻迎來的第一個考驗</p>
                             <p>還好10年的感情沒有那麼容易散啦</p>
                         </div>
                     </div>
@@ -312,7 +312,6 @@
                                         <option>男方親戚</option>
                                         <option>男方同學</option>
                                         <option>男方朋友</option>
-                                        <option>洗破皮</option>
                                         <option>小貓球隊</option>
                                         <option>女方親戚</option>
                                         <option>女方同學</option>
@@ -535,7 +534,6 @@
     </script>
     <script>
         window.addEventListener('load', function () {
-
             const btn = document.getElementById('enterBtn');
             const btnText = btn.querySelector('.btn-text');
             const overlay = document.getElementById('introOverlay');
@@ -568,6 +566,7 @@
 
         // 點擊後關閉遮罩
         document.getElementById('enterBtn').addEventListener('click', function () {
+            window.scrollTo(0, 0);
 
             const overlay = document.getElementById('introOverlay');
 
