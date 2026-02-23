@@ -275,6 +275,38 @@
     font-style: italic;
 }
 
+.section-area.area1 .arrow-down {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    color: #fff;
+    transform: translateX(-50%);
+    animation: bounce 1.5s infinite;
+    opacity: 0.8;
+    transition: all 0.2s ease-in-out;
+}
+
+.section-area.area1 .arrow-down:hover {
+    opacity: 1;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translate(-50%, 0);
+    }
+
+    50% {
+        transform: translate(-50%, 10px);
+    }
+}
+
 @media (min-width: 576px) {
     .section-area.area1 .item .pic-item h2 {
         font-size: 100px;
@@ -331,7 +363,7 @@
     }
 
     .section-area.area1 .item h4 {
-        margin-top: 90px;
+        margin-top: 50px;
     }
 }
 
@@ -1063,7 +1095,7 @@
 .section-area.area10 #app .form-control,
 .section-area.area10 #app .form-select {
     border-color: #fff;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .section-area.area10 #app .form-control:focus,

@@ -79,9 +79,10 @@
                     </div>
                 </div>
             </div>
+            <a href="#Sean&Cindy" class="arrow-down wow fadeIn"><i class="fa-solid fa-angles-down"></i></a>
         </section>
 
-        <section class="section-area area2">
+        <section class="section-area area2" id="Sean&Cindy">
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col-lg-6 mb-3 wow fadeInUp">
@@ -297,17 +298,26 @@
 
                                 <div class="col-lg-6 mb-2">
                                     <label class="form-label">姓名</label>
-                                    <input type="text" class="form-control" v-model="form.name" required>
+                                    <input type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                                        v-model="form.name">
+                                    <div class="invalid-feedback mb-4">
+                                        {{ errors.name }}
+                                    </div>
                                 </div>
 
                                 <div class="col-lg-6  mb-2">
                                     <label class="form-label">聯絡電話</label>
-                                    <input type="tel" class="form-control" v-model="form.phone" required>
+                                    <input type="tel" class="form-control" :class="{ 'is-invalid': errors.phone }"
+                                        v-model="form.phone">
+                                    <div class="invalid-feedback mb-4">
+                                        {{ errors.phone }}
+                                    </div>
                                 </div>
 
                                 <div class="col-12  mb-2">
                                     <label class="form-label">您和新人的關係是？</label>
-                                    <select class="form-select" v-model="form.relation" required>
+                                    <select class="form-select" :class="{ 'is-invalid': errors.relation }"
+                                        v-model="form.relation" @change="clearError('relation')">
                                         <option disabled value="">請選擇</option>
                                         <option>男方親戚</option>
                                         <option>男方同學</option>
@@ -317,18 +327,25 @@
                                         <option>女方同學</option>
                                         <option>女方朋友</option>
                                     </select>
+                                    <div class="invalid-feedback mb-4">
+                                        {{ errors.relation }}
+                                    </div>
                                 </div>
 
                                 <div class="col-12  mb-2">
                                     <label class="form-label">是否出席5/30的婚禮</label>
-                                    <select class="form-select" v-model="form.attend" required>
+                                    <select class="form-select" :class="{ 'is-invalid': errors.attend }"
+                                        v-model="form.attend" @change="clearError('attend')">
                                         <option disabled value="">請選擇</option>
                                         <option>可以參加</option>
                                         <option>無法參加</option>
                                         <option>我一定會參加，但是我不確定要攜幾個伴 或是隱+3 ，所以我先填表 (+80分)</option>
                                         <option>我原本有事....但為了這個婚禮，決定排除萬難決定參加了！！ (+120分)</option>
-                                        <option>嗚嗚嗚嗚嗚嗚，我真的沒辦法參加，私訊留言祝福 (看字數+分) </option>
+                                        <option>嗚嗚嗚嗚嗚嗚，我真的沒辦法參加，私訊留言祝福 (看字數+分)</option>
                                     </select>
+                                    <div class="invalid-feedback mb-4">
+                                        {{ errors.attend }}
+                                    </div>
                                 </div>
 
                                 <template
@@ -336,7 +353,8 @@
 
                                     <div class="col-lg-6  mb-2">
                                         <label class="form-label">出席的成人人數</label>
-                                        <select class="form-select" v-model="form.adults" required>
+                                        <select class="form-select" :class="{ 'is-invalid': errors.adults }"
+                                            v-model="form.adults" @change="clearError('adults')">
                                             <option disabled value="">請選擇</option>
                                             <option>1人</option>
                                             <option>2人</option>
@@ -344,33 +362,45 @@
                                             <option>4人</option>
                                             <option>5人</option>
                                         </select>
+                                        <div class="invalid-feedback mb-4">
+                                            {{ errors.adults }}
+                                        </div>
                                     </div>
 
                                     <div class="col-lg-6  mb-2">
                                         <label class="form-label">出席的兒童人數</label>
-                                        <select class="form-select" v-model="form.children" required>
+                                        <select class="form-select" :class="{ 'is-invalid': errors.children }"
+                                            v-model="form.children" @change="clearError('children')">
                                             <option disabled value="">請選擇</option>
                                             <option>0</option>
                                             <option>1</option>
                                             <option>2</option>
                                             <option>3</option>
                                         </select>
+                                        <div class="invalid-feedback mb-4">
+                                            {{ errors.children }}
+                                        </div>
                                     </div>
 
                                     <div class="col-lg-6  mb-2">
                                         <label class="form-label">小寶貝需要幾張兒童椅</label>
-                                        <select class="form-select" v-model="form.childSeat" required>
+                                        <select class="form-select" :class="{ 'is-invalid': errors.childSeat }"
+                                            v-model="form.childSeat" @change="clearError('childSeat')">
                                             <option disabled value="">請選擇</option>
                                             <option>0</option>
                                             <option>1</option>
                                             <option>2</option>
                                             <option>3</option>
                                         </select>
+                                        <div class="invalid-feedback mb-4">
+                                            {{ errors.childSeat }}
+                                        </div>
                                     </div>
 
                                     <div class="col-lg-6  mb-2">
                                         <label class="form-label">是否準備素食？需要幾份呢？</label>
-                                        <select class="form-select" v-model="form.vegetarian" required>
+                                        <select class="form-select" :class="{ 'is-invalid': errors.vegetarian }"
+                                            v-model="form.vegetarian" @change="clearError('vegetarian')">
                                             <option disabled value="">請選擇</option>
                                             <option>0</option>
                                             <option>1</option>
@@ -383,6 +413,9 @@
                                             <option>8</option>
 
                                         </select>
+                                        <div class="invalid-feedback mb-4">
+                                            {{ errors.vegetarian }}
+                                        </div>
                                     </div>
 
                                 </template>
@@ -390,24 +423,35 @@
                                 <!-- 是否需要實體喜帖 -->
                                 <div class="col-12 mb-2">
                                     <label class="form-label">需要紙本喜帖嗎？</label>
-                                    <select class="form-select" v-model="form.needCard" required>
+                                    <select class="form-select" :class="{ 'is-invalid': errors.needCard}"
+                                        v-model="form.needCard" @change="clearError('needCard')">
                                         <option disabled value="">請選擇</option>
                                         <option>不用啦！環保愛地球，電子喜帖就好漂亮了欸</option>
                                         <option>我需要紙本喜帖收藏一輩子！</option>
                                     </select>
+                                    <div class="invalid-feedback mb-4">
+                                        {{ errors.needCard }}
+                                    </div>
                                 </div>
                                 <template v-if="form.needCard === '我需要紙本喜帖收藏一輩子！'">
                                     <div class="col-12 mb-2">
                                         <label class="form-label">喜帖地址</label>
-                                        <input type="text" class="form-control" v-model="form.address" required>
+                                        <input type="text" :class="{ 'is-invalid': errors.address }"
+                                            class="form-control" v-model="form.address">
+                                        <div class="invalid-feedback mb-4">
+                                            {{ errors.address }}
+                                        </div>
                                     </div>
 
                                 </template>
 
                                 <div class="col-12 mb-2">
                                     <label class="form-label">我有超厲害、超實用的建議或其他需求</label>
-                                    <textarea class="form-control" rows="10" v-model="form.message"
-                                        placeholder="想與新人說的話..." required></textarea>
+                                    <textarea :class="{ 'is-invalid': errors.message }" class="form-control" rows="10"
+                                        v-model="form.message" placeholder="想與新人說的話..."></textarea>
+                                    <div class="invalid-feedback mb-4">
+                                        {{ errors.message }}
+                                    </div>
                                 </div>
 
                                 <div class="text-center mt-5">
@@ -516,18 +560,16 @@
     <script src="js/form.js"></script>
     <script src="lib/timer/timer.js"></script>
     <script>
-
         var wow = new WOW(
             {
-                boxClass: 'wow',      // 要套用WOW.js縮需要的動畫class(預設是wow)
-                animateClass: 'animated', // 要"動起來"的動畫(預設是animated, 因此如果你有其他動畫library要使用也可以在這裡調整)
-                offset: 0,          // 距離顯示多遠開始顯示動畫 (預設是0, 因此捲動到顯示時才出現動畫)
-                mobile: true,       // 手機上是否要套用動畫 (預設是true)
-                live: true,       // 非同步產生的內容是否也要套用 (預設是true, 非常適合搭配SPA)
+                boxClass: 'wow',
+                animateClass: 'animated',
+                offset: 0,
+                mobile: true,
+                live: true,
                 callback: function (box) {
-                    // 當每個要開始時, 呼叫這裡面的內容, 參數是要開始進行動畫特效的element DOM
                 },
-                scrollContainer: null // 可以設定成只套用在某個container中捲動才呈現, 不設定就是整個視窗
+                scrollContainer: null
             }
         );
         wow.init();
