@@ -841,7 +841,7 @@
 }
 
 .section-area.area7 .video-item .video-container {
-    width: 75%;
+    width: 73%;
     padding-bottom: 130%;
     position: relative;
     overflow: hidden;
@@ -858,7 +858,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .section-area.area7 .item {
@@ -886,7 +886,7 @@
     }
 
     .section-area.area7 .video-item .video-container {
-        width: 80%;
+        width: 73%;
         padding-bottom: 130%;
     }
 

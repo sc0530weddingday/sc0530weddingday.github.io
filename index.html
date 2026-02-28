@@ -97,7 +97,8 @@
                     <div class="col-12 col-lg-6 mb-3 wow fadeInUp">
                         <div class="item">
                             <div class="video-container">
-                                <video src="video/2.mp4" muted loop playsinline webkit-playsinline></video>
+                                <video id="firstVideo" src="video/2.mp4" muted loop playsinline
+                                    webkit-playsinline></video>
                             </div>
                             <span>Sean & Cindy</span>
 
@@ -205,16 +206,18 @@
                 </div>
             </div>
         </section>
-        <section class="section-area area7">
+        <section class="section-area area7" id="video">
             <div class="container-xl">
                 <div class="row align-items-center">
                     <div class="col-12 col-lg-5 wow fadeIn order-2 order-lg-1 mb-3">
                         <div class="video-item">
                             <div class="video-container">
-                                <video src="video/1.mp4" muted loop playsinline webkit-playsinline></video>
+                                <!-- <video src="video/1.mp4" muted loop playsinline webkit-playsinline></video> -->
+                                <video poster="video/video.webp" src="video/3.mp4" controls
+                                    controlsList="nodownload noremoteplayback" disablePictureInPicture></video>
 
                             </div>
-                            <img src="img/6.webp" alt="">
+                            <!-- <img src="img/6.webp" alt=""> -->
                         </div>
                     </div>
                     <div class="col-12 col-lg-7 wow fadeInUp order-1 order-lg-2 mb-3">
@@ -621,6 +624,27 @@
         });
     </script>
     <script>
+        const firstVideo = document.getElementById('firstVideo');
+
+        if (firstVideo) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target;
+
+                    if (entry.isIntersecting) {
+                        video.play().catch(() => { });
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, {
+                threshold: 0.5 // 影片有50%出現在畫面才播放
+            });
+
+            observer.observe(firstVideo);
+        }
+    </script>
+    <!-- <script>
         const videos = document.querySelectorAll('video');
 
         const observer = new IntersectionObserver((entries) => {
@@ -640,7 +664,7 @@
         videos.forEach(video => {
             observer.observe(video);
         });
-    </script>
+    </script> -->
 </body>
 
 </html>
