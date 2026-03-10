@@ -208,7 +208,7 @@ new Vue({
         },
         successHandler() {
             swal({
-                title: "送出成功 💖",
+                title: "送出成功 ♡",
                 text: "我們已收到您的回覆，期待相見！",
                 icon: "success",
                 buttons: false,   // 不顯示按鈕
