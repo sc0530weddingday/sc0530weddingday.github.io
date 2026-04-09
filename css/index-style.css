@@ -221,7 +221,7 @@
     justify-content: center;
 }
 
-.glass {
+#introOverlay .glass {
     position: absolute;
     width: 40px;
     opacity: 0;
@@ -233,22 +233,23 @@
     user-drag: none;
     -webkit-user-drag: none;
     pointer-events: none;
+    margin: 0;
 }
 
-.glass.show {
+#introOverlay .glass.show {
     opacity: 1;
     transform: translateY(0);
 }
 
 /* 初始 \ START / */
 
-.glass-left.show {
+#introOverlay .glass-left.show {
     left: 30px;
     bottom: 10px;
     transform: rotate(-18deg);
 }
 
-.glass-right.show {
+#introOverlay .glass-right.show {
     right: 30px;
     bottom: 10px;
     transform: rotate(18deg);
@@ -878,6 +879,10 @@
         font-size: 20px;
     }
 
+    .section-area.area4 .text-item2 img {
+        width: 200px;
+    }
+
     .section-area.area4 .item img {
         transform: scale(1);
         width: 200px;
@@ -1125,7 +1130,7 @@
 }
 
 .section-area.area9 {
-    padding-top: 100px;
+    padding: 100px 0;
     background: #fbf7ee;
     min-height: auto;
 }
@@ -1175,7 +1180,7 @@
 
 @media (min-width: 1200px) {
     .section-area.area9 {
-        padding-top: 100px;
+        padding: 100px 0;
     }
 
     .section-area.area9 .item h2 {
@@ -1312,6 +1317,34 @@
     text-align: center;
 }
 
+.section-area.area11 .item p {
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 30px 0;
+    color: #000;
+    font-family: SourceHanSansSC-Light;
+    font-weight: bold;
+    margin-bottom: 0px;
+    line-height: 2;
+}
+
+@media (min-width: 1200px) {
+    .section-area.area11 .item p {
+        line-height: 1.5;
+        padding: 60px 0;
+        font-size: 16px;
+        margin-bottom: 0;
+        letter-spacing: 5px;
+
+    }
+}
+
+.section-area.area11 .item p span {
+    color: #000;
+    font-weight: lighter;
+}
+
 .section-area.area11 .item h2 {
     font-size: 18px;
     letter-spacing: 2px;
@@ -1332,18 +1365,19 @@
     border-radius: 10px;
     display: inline-block;
     font-weight: bolder;
+    margin-top: 50px;
 }
 
 .section-area.area11 .text-item h3 {
     font-size: 14px;
     color: #fff;
     font-family: 'SourceHanSansSC-Light';
-    letter-spacing: auto;
+    letter-spacing: 2px;
     margin: 0;
 }
 
 .section-area.area11 h4 {
-    font-size: 16px;
+    font-size: 18px;
     color: #3f6594;
     font-family: 'SourceHanSansSC-Light';
     letter-spacing: 2px;
@@ -1351,10 +1385,17 @@
 }
 
 .section-area.area11 p {
+    letter-spacing: 2px;
     color: #000;
-    font-size: 15px;
+    font-size: 16px;
     font-family: 'SourceHanSansSC-Light';
-    letter-spacing: auto;
+}
+
+@media (min-width: 1200px) {
+    .section-area.area11 p {
+        letter-spacing: 5px;
+
+    }
 }
 
 .section-area.area11 p span {
@@ -1408,6 +1449,7 @@
     }
 
     .section-area.area11 .text-item h3 {
+        letter-spacing: 10px;
         font-size: 18px;
     }
 
@@ -1698,3 +1740,76 @@
     }
 
 }
+
+/* --Start area--------------- */
+.section-area.area13 {
+    background: url(../img/bg.webp) no-repeat center center/ cover scroll;
+    min-height: 100vh;
+    overflow: hidden;
+    padding: 100px 0;
+}
+
+.section-area.area13 .item {
+    padding: 50px 0;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    font-family: SourceHanSansSC-Light;
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+@media (min-width: 1200px) {
+
+    .section-area.area13 .item {
+        letter-spacing: 5px;
+        font-size: 20px;
+        padding: 100px 0;
+    }
+}
+
+.section-area.area4 .sop-1 {
+    width: 100px;
+}
+
+
+
+
+.section-area.area4 .sop-2 {
+    width: 100%;
+    margin-top: 50px;
+}
+
+.section-area.area4 .sop-3 {
+    width: 120px;
+    margin-top: 100px;
+}
+
+
+.section-area.area4 .sop-item span {
+    letter-spacing: px;
+    color: #a6a6a6;
+    font-size: 15px;
+    display: block;
+    font-family: SourceHanSansSC-Light;
+    padding-top: 10px;
+}
+
+@media (min-width: 992px) {
+    .section-area.area4 .sop-1 {
+        width: 220px;
+    }
+
+    .section-area.area4 .sop-2 {
+        width: 90%;
+    }
+
+    .section-area.area4 .sop-3 {
+        width: 200px;
+    }
+
+    .section-area.area4 .sop-item span {
+        letter-spacing: 2px;
+    }
+}
+
+/* --End area--------------- */
