@@ -1781,20 +1781,37 @@
 
 .section-area.area4 .sop-3 {
     width: 120px;
-    margin-top: 100px;
+    margin-top: 50px;
+}
+
+.section-area.area4 .sop-4 {
+    width: 100%;
+    margin: auto;
+    margin-top: 50px;
+
 }
 
 
 .section-area.area4 .sop-item span {
-    letter-spacing: px;
     color: #a6a6a6;
-    font-size: 15px;
+    font-size: 14px;
     display: block;
     font-family: SourceHanSansSC-Light;
     padding-top: 10px;
 }
 
+@media (min-width: 768px) {
+    .section-area.area4 .sop-1 {
+        width: 180px;
+    }
+
+    .section-area.area4 .sop-4 {
+        width: 80%;
+    }
+}
+
 @media (min-width: 992px) {
+
     .section-area.area4 .sop-1 {
         width: 220px;
     }
@@ -1804,12 +1821,15 @@
     }
 
     .section-area.area4 .sop-3 {
+        margin-top: 100px;
         width: 200px;
     }
 
     .section-area.area4 .sop-item span {
         letter-spacing: 2px;
     }
+
+
 }
 
 /* --End area--------------- */
