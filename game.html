@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>婚禮熱身小遊戲</title>
-    <link rel="shortcut icon" href="img/game/3.webp" type="image/x-icon">
+    <link rel="shortcut icon" href="img/game/game/3.webp" type="image/x-icon">
     <meta name="description" content="50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！">
 
     <meta property="og:title" content="婚禮熱身小遊戲">
@@ -14,7 +14,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:site_name" content="婚禮熱身小遊戲">
-    <meta property="og:image" content="img/game/3.webp">
+    <meta property="og:image" content="img/game/game/3.webp">
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
@@ -35,11 +35,7 @@
 <body>
 
     <main>
-        <audio id="bg-music" loop>
-            <source src="/sound/bg.mp3" type="audio/mpeg">
-        </audio>
-
-        <!-- <audio id="bg-music" src="./sound/bg.mp3" loop autoplay></audio> -->
+        <audio id="bg-music" src="./sound/bg.mp3" loop autoplay></audio>
 
         <div id="loading" class="loading-screen">
             <div class="sub">Sean & Cindy</div>
@@ -223,7 +219,10 @@
                     if (!this.audioCtx || !this.audioBuffers[name]) return;
                     const src = this.audioCtx.createBufferSource();
                     src.buffer = this.audioBuffers[name];
-                    src.connect(this.audioCtx.destination);
+                    const gain = this.audioCtx.createGain();
+                    gain.gain.value = 1.0; // 音效最大聲
+                    src.connect(gain);
+                    gain.connect(this.audioCtx.destination);
                     src.start(0);
                 };
                 // 預載圖片，避免第一次出現時閃爍
@@ -236,7 +235,7 @@
             mounted() {
                 const bgAudio = document.getElementById('bg-music');
                 if (bgAudio) {
-                    bgAudio.volume = 0.1; // 調整音量
+                    bgAudio.volume = 0.1; // 背景音樂小聲
                     bgAudio.loop = true;
                     bgAudio.play().catch(err => console.log('背景音樂播放被瀏覽器阻擋', err));
                 }
@@ -258,7 +257,7 @@
                     this.initAudio(); // 用戶點擊後才建立 AudioContext
                     const bgAudio = document.getElementById('bg-music');
                     if (bgAudio) {
-                        bgAudio.volume = 0.1;
+                        bgAudio.volume = 0.1; // 背景音樂小聲
                         bgAudio.loop = true;
                         bgAudio.play().catch(err => console.log('背景音樂播放被瀏覽器阻擋', err));
                     }
