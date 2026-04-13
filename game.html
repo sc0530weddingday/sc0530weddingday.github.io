@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>婚禮熱身小遊戲</title>
+    <link rel="shortcut icon" href="img/game/3.webp" type="image/x-icon">
+    <meta name="description" content="50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！">
+
+    <meta property="og:title" content="婚禮熱身小遊戲">
+    <meta property="og:description" content="50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="婚禮熱身小遊戲">
+    <meta property="og:image" content="img/game/3.webp">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/game-style.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-68H5TZ7VE8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-68H5TZ7VE8');
+    </script>
+</head>
+
+<body>
+
+    <main>
+        <audio id="bg-music" loop>
+            <source src="/sound/bg.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- <audio id="bg-music" src="./sound/bg.mp3" loop autoplay></audio> -->
+
+        <div id="loading" class="loading-screen">
+            <div class="sub">Sean & Cindy</div>
+            <div>Game is Loading<span class="loading-dots"></span></div>
+            <div style="font-size:0.8rem;opacity:0.9;margin-top:4px;">♡ 建議開啟聲音遊玩 ♡</div>
+        </div>
+        <div id="app" class="panel">
+            <div v-if="savingScore" class="loading-overlay">
+                <div class="loading-spinner">儲存中...</div>
+            </div>
+            <!-- 倒數覆蓋層 -->
+            <div v-if="countdown > 0"
+                class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                style="background: rgba(0,0,0,0.8); font-size: 100px; font-weight: bold; color: #fff; z-index: 9999;">
+                {{countdown}}
+            </div>
+
+            <div class="container-xl">
+                <!-- Header -->
+                <div class="row justify-content-between align-items-center my-3">
+                    <div class="col-lg-7">
+                        <div class="game-title-en text-center text-lg-start">Wedding Game</div>
+                        <div class="game-title-zh text-center text-lg-start">婚禮熱身小遊戲</div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="row justify-content-center justify-content-lg-start align-items-center my-3">
+                            <div class="col-4 text-center">
+                                <div class="stat-label">TIME</div>
+                                <div class="stat-value">{{timeLeft}}s</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="stat-label">SCORE</div>
+                                <div class="stat-value">{{score}}</div>
+                            </div>
+                            <div class="col-4 text-center" v-if="highscores.length > 0">
+                                <div class="stat-label">BEST</div>
+                                <div class="stat-value" style="color: var(--beige);">{{highscores[0].score}}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button v-if="running && !paused" class="btn-wedding outline" @click="pauseGame">暫停</button>
+                            <button v-if="paused" class="btn-wedding" @click="resumeGame">繼續</button>
+                            <button v-if="running || paused" class="btn-wedding outline"
+                                @click="restartGame">重新開始</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Left: Game Board -->
+                    <div class="col-lg-7">
+                        <div class="info mb-2 p-2">
+                            <div>50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！</div>
+                            <div>• 惡魔+1分 (小心不要打到貓咪啦)</div>
+                            <div>• 貓咪-1分</div>
+                            <div class="pt-2">使用手機體驗較佳</div>
+                        </div>
+                        <div class="board" style="position:relative;">
+                            <!-- 開始遮罩 -->
+                            <div v-if="!running && !paused" class="board-overlay" @click.prevent @touchstart.prevent>
+                                <div class="board-overlay-inner">
+                                    <!-- <div class="game-title-en mb-1" style="font-size:2.2rem; opacity:0.85;">Touch the
+                                        Cow</div> -->
+                                    <button class="btn-start" @click.stop="startGame"
+                                        @touchstart.stop.prevent="startGame">START</button>
+                                </div>
+                            </div>
+                            <template v-for="(hole, idx) in holes">
+                                <div class="hole" :key="idx" :class="getLure(idx) ? 'lure-' + getLure(idx) : ''"
+                                    @click.prevent="hit(idx)" @touchstart.prevent="hit(idx)">
+                                    <div class="hole-inner">
+                                        <img v-if="getMole(idx)" :src="getMole(idx).img" class="mole"
+                                            :class="{'up': !!getMole(idx), 'hit': hitIndex===idx}">
+                                        <div v-else
+                                            style="width:78%;height:78%;border-radius:50%;background:transparent;">
+                                        </div>
+
+                                        <!-- 根據地鼠種類顯示 +1 或 -1 -->
+                                        <div v-if="hitIndex===idx" class="hit-effect" :class="hitType">
+                                            {{ hitType === 'minus' ? '-1' : '+1' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Right: Leaderboard -->
+                    <div class="col-lg-5">
+                        <div class="leaders">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="leaders-title">Ranking</div>
+                                <div class="stat-label">前 5 名</div>
+                            </div>
+                            <div v-if="highscores.length===0" style="font-size:0.82rem;opacity:0.55;">尚無紀錄，開始遊戲取得高分 ♡
+                            </div>
+                            <div v-for="(h,i) in highscores" :key="h.phone" class="leader-item">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="leader-rank">{{i+1}}</div>
+                                    <div>
+                                        <div style="font-size:0.88rem;">{{h.name || '匿名'}}</div>
+                                        <div class="stat-label">{{formatDate(h.date)}}</div>
+                                    </div>
+                                </div>
+                                <div class="leader-score">{{h.score}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <div v-if="showNameModal"
+                    class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                    style="background: rgba(251,247,238,0.85); backdrop-filter:blur(6px); padding:18px; z-index:9999;">
+                    <div class="modal-custom">
+                        <div class="game-title-en mb-1" style="font-size:2rem;">Game Over</div>
+                        <div class="game-title-zh mb-3" style="font-size:0.9rem;">您的分數 ♡ <span
+                                style="font-size:1.4rem;">{{score}}</span></div>
+                        <input v-model="playerName" class="form-control mb-2" placeholder="您的名字（顯示於排行榜）" />
+                        <input v-model="playerPhone" class="form-control mb-3" placeholder="電話（僅用於辨識，不公開）" />
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn-wedding" @click="saveScore">儲存</button>
+                            <button class="btn-wedding outline" @click="closeModal">略過</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    gridSize: 9,
+                    holes: Array.from({ length: 9 }),
+                    moles: [], // [{ idx, img }, ...] 支援多隻地鼠
+                    lures: [], // [{ idx, color, id }, ...] 獨立誘導框
+                    lureTimerId: null,
+                    hitIndex: null,
+                    score: 0,
+                    timeLeft: 50,
+                    running: false,
+                    paused: false,
+                    timerId: null,
+                    moleTimerId: null,
+                    highscores: [],
+                    topN: 5,
+                    showNameModal: false,
+                    playerName: '',
+                    playerPhone: '',
+                    savingScore: false,
+                    countdown: 0,
+                    countdownTimerId: null,
+                    hitType: null,
+                    googleApiUrl: 'https://script.google.com/macros/s/AKfycbyhKZN-22We15mciytzTBkQNtapv_kTYqZFjk1KmMhcoiLXex-BvwLDxFzIzYJD5FXg/exec' // <-- 替換成你的 Google Apps Script URL
+                };
+            },
+            created() {
+                // Web Audio API — 預先解碼，行動裝置零延遲播放
+                this.audioCtx = null;
+                this.audioBuffers = {};
+                const loadSound = async (name, url) => {
+                    try {
+                        const res = await fetch(url);
+                        const arrBuf = await res.arrayBuffer();
+                        this.audioBuffers[name] = await this.audioCtx.decodeAudioData(arrBuf);
+                    } catch (e) { console.warn('音效載入失敗', name, e); }
+                };
+                this.initAudio = () => {
+                    if (this.audioCtx) return;
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    loadSound('hit', './sound/hit.mp3');
+                    loadSound('miss', './sound/miss.mp3');
+                };
+                this.playSound = (name) => {
+                    if (!this.audioCtx || !this.audioBuffers[name]) return;
+                    const src = this.audioCtx.createBufferSource();
+                    src.buffer = this.audioBuffers[name];
+                    src.connect(this.audioCtx.destination);
+                    src.start(0);
+                };
+                // 預載圖片，避免第一次出現時閃爍
+                ['./img/game/1.webp', './img/game/2.webp', './img/game/3.webp'].forEach(src => {
+                    const img = new Image();
+                    img.src = src;
+                });
+                this.loadHighscores();
+            },
+            mounted() {
+                const bgAudio = document.getElementById('bg-music');
+                if (bgAudio) {
+                    bgAudio.volume = 0.1; // 調整音量
+                    bgAudio.loop = true;
+                    bgAudio.play().catch(err => console.log('背景音樂播放被瀏覽器阻擋', err));
+                }
+                // 模擬資源載入完成後再顯示主畫面
+                const showApp = () => {
+                    const loader = document.getElementById('loading');
+                    const app = document.getElementById('app');
+                    if (loader) loader.style.display = 'none';
+                    if (app) app.style.display = 'block';
+                };
+                if (document.readyState === 'complete') {
+                    showApp();
+                } else {
+                    window.addEventListener('load', showApp);
+                }
+            },
+            methods: {
+                startBackgroundMusic() {
+                    this.initAudio(); // 用戶點擊後才建立 AudioContext
+                    const bgAudio = document.getElementById('bg-music');
+                    if (bgAudio) {
+                        bgAudio.volume = 0.1;
+                        bgAudio.loop = true;
+                        bgAudio.play().catch(err => console.log('背景音樂播放被瀏覽器阻擋', err));
+                    }
+                },
+                // 倒數 3-2-1
+                beginCountdown() {
+                    // 防止 touchstart + click 雙觸發，或遊戲已在跑
+                    if (this.running || this.countdown > 0) return;
+                    this.countdown = 3;
+                    this.countdownTimerId = setInterval(() => {
+                        this.countdown--;
+                        if (this.countdown <= 0) {
+                            clearInterval(this.countdownTimerId);
+                            this.countdownTimerId = null;
+                            this.countdown = 0;
+                            this._startGame();
+                        }
+                    }, 1000);
+                },
+
+                // 真正開始遊戲
+                _startGame() {
+                    this.running = true;
+                    this.paused = false;
+                    this.score = 0;
+                    this.timeLeft = 50;
+                    this.moles = [];
+                    this.hitIndex = null;
+                    this.clearTimers();
+                    this.startTimers();
+                },
+
+                // 原本 startGame 改成呼叫倒數
+                startGame() {
+                    this.startBackgroundMusic();
+                    this.beginCountdown();
+                },
+                formatDate(dateStr) {
+                    const d = new Date(dateStr);
+                    const month = d.getMonth() + 1;
+                    const day = d.getDate();
+                    const hours = d.getHours().toString().padStart(2, '0');
+                    const minutes = d.getMinutes().toString().padStart(2, '0');
+                    return `${month}/${day} ${hours}:${minutes}`;
+                },
+                startTimers() {
+                    this.timerId = setInterval(() => {
+                        if (!this.paused) {
+                            this.timeLeft--;
+                            if (this.timeLeft <= 0) this.endGame();
+                        }
+                    }, 1000);
+                    this.scheduleNextMole();
+                    this.scheduleLure();
+                },
+                clearTimers() {
+                    clearInterval(this.timerId);
+                    clearTimeout(this.moleTimerId);
+                    clearTimeout(this.lureTimerId);
+                    clearInterval(this.countdownTimerId);
+                    this.timerId = null;
+                    this.moleTimerId = null;
+                    this.lureTimerId = null;
+                    this.countdownTimerId = null;
+                },
+                scheduleNextMole() {
+                    const elapsed = 50 - this.timeLeft;
+                    // 速度：620ms → 280ms（隨時間縮短）
+                    const delay = Math.max(280, 620 - elapsed * 7) + Math.random() * 150;
+                    // 最多幾隻：前 20 秒 1 隻，之後 2 隻
+                    const maxMoles = elapsed >= 20 ? 2 : 1;
+                    // 壞牛比例：25% → 50%
+                    const badChance = Math.min(0.5, 0.25 + elapsed * 0.005);
+
+                    this.moleTimerId = setTimeout(() => {
+                        if (this.running && !this.paused) {
+                            // 超過上限時移除最舊的
+                            while (this.moles.length >= maxMoles) {
+                                this.moles.shift();
+                            }
+
+                            // 選一個沒被佔用的格子
+                            const occupied = this.moles.map(m => m.idx);
+                            let idx, tries = 0;
+                            do {
+                                idx = Math.floor(Math.random() * this.holes.length);
+                                tries++;
+                            } while (occupied.includes(idx) && tries < 20);
+
+                            const img = Math.random() < badChance ? './img/game/1.webp' : './img/game/2.webp';
+                            this.moles.push({ idx, img });
+                            this.scheduleNextMole();
+                        } else if (this.paused) {
+                            this.moleTimerId = null;
+                        }
+                    }, delay);
+                },
+                pauseGame() { this.paused = true; this.clearTimers(); },
+                resumeGame() { this.paused = false; this.startTimers(); },
+                restartGame() {
+                    this.clearTimers();
+                    this.moles = [];
+                    this.lures = [];
+                    this.hitIndex = null;
+                    this.score = 0;
+                    this.timeLeft = 50;
+                    this.running = false;
+                    this.paused = false;
+                    this.beginCountdown();
+                },
+                getMole(idx) {
+                    return this.moles.find(m => m.idx === idx) || null;
+                },
+                getLure(idx) {
+                    const l = this.lures.find(l => l.idx === idx);
+                    return l ? l.color : null;
+                },
+                scheduleLure() {
+                    const elapsed = 50 - this.timeLeft;
+                    // 15 秒前每秒確認一次，15 秒後開始隨機放框
+                    const delay = elapsed < 15 ? 1000 : 400 + Math.random() * 500;
+                    this.lureTimerId = setTimeout(() => {
+                        if (!this.running || this.paused) return;
+                        const el = 50 - this.timeLeft;
+                        if (el >= 15) {
+                            const idx = Math.floor(Math.random() * 9);
+                            const color = Math.random() < 0.5 ? 'green' : 'red';
+                            const id = Date.now();
+                            if (this.lures.length >= 2) this.lures.shift();
+                            this.lures.push({ idx, color, id });
+                            // 框框顯示 600–1000ms 後消失
+                            setTimeout(() => {
+                                const i = this.lures.findIndex(l => l.id === id);
+                                if (i !== -1) this.lures.splice(i, 1);
+                            }, 600 + Math.random() * 400);
+                        }
+                        this.scheduleLure();
+                    }, delay);
+                },
+                hit(idx) {
+                    if (!this.running || this.paused) return;
+                    const moleIdx = this.moles.findIndex(m => m.idx === idx);
+                    if (moleIdx === -1) return;
+
+                    const img = this.moles[moleIdx].img;
+                    if (img === './img/game/3.webp') return; // 動畫中，忽略重複點擊
+                    this.hitIndex = idx;
+                    this.hitType = (img === './img/game/1.webp') ? 'minus' : 'plus';
+
+                    if (img === './img/game/1.webp') {
+                        // 壞牛：先變 3.webp，300ms 後移除
+                        this.moles.splice(moleIdx, 1, { idx, img: './img/game/3.webp' });
+                        this.score = Math.max(0, this.score - 1);
+                        this.playSound('miss');
+                        setTimeout(() => {
+                            const i = this.moles.findIndex(m => m.idx === idx && m.img === './img/game/3.webp');
+                            if (i !== -1) this.moles.splice(i, 1);
+                            this.hitIndex = null;
+                        }, 300);
+                    } else {
+                        // 好牛：直接移除
+                        this.moles.splice(moleIdx, 1);
+                        this.score += 1;
+                        this.playSound('hit');
+                        setTimeout(() => { this.hitIndex = null; }, 300);
+                    }
+                },
+
+                endGame() {
+                    this.clearTimers();
+                    this.running = false;
+                    this.moles = [];
+                    this.lures = [];
+                    this.hitIndex = null;
+
+                    this.playerName = ''; this.playerPhone = '';
+                    this.showNameModal = true;
+                },
+                closeModal() { this.showNameModal = false; this.paused = false; },
+                saveScore() {
+                    if (!this.playerPhone.trim()) {
+                        alert('請輸入電話');
+                        return;
+                    }
+                    // 顯示 loading 並禁止再次點擊
+                    this.savingScore = true;
+
+                    const name = (this.playerName || '匿名').slice(0, 30);
+                    const phone = this.playerPhone.trim();
+                    const now = new Date();
+                    const month = now.getMonth() + 1;
+                    const day = now.getDate();
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    const date = `${month}/${day} ${hours}:${minutes}`;
+
+                    const callbackName = 'handleSave_' + Date.now();
+                    const script = document.createElement('script');
+
+                    // 樂觀更新：立刻把新分數插入本地排行榜，不等伺服器回應
+                    const optimisticUpdate = () => {
+                        const existing = this.highscores.findIndex(h => h.phone === phone);
+                        const entry = { name, phone, score: this.score, date };
+                        let updated = [...this.highscores];
+                        if (existing !== -1) {
+                            if (this.score > updated[existing].score) updated[existing] = entry;
+                        } else {
+                            updated.push(entry);
+                        }
+                        updated.sort((a, b) => b.score - a.score);
+                        this.highscores = updated.slice(0, this.topN);
+                        this.showNameModal = false;
+                        this.savingScore = false;
+                    };
+                    optimisticUpdate();
+
+                    window[callbackName] = (res) => {
+                        this.loadHighscores(); // 背景靜默同步真實資料
+
+                        // 清理
+                        delete window[callbackName];
+                        if (script.parentNode) {
+                            script.parentNode.removeChild(script);
+                        }
+                    };
+
+                    // 傳送資料給 Google Apps Script，由後端判斷是否更新
+                    script.src = `${this.googleApiUrl}?action=post&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&score=${this.score}&date=${encodeURIComponent(date)}&callback=${callbackName}`;
+                    script.async = true;
+                    document.body.appendChild(script);
+                },
+
+                loadHighscores() {
+                    const callbackName = 'handleLoad_' + Date.now();
+                    const script = document.createElement('script');
+
+                    window[callbackName] = (data) => {
+                        this.highscores = data; // 更新排行榜
+
+                        // 清理
+                        delete window[callbackName];
+                        if (script.parentNode) {
+                            script.parentNode.removeChild(script);
+                        }
+                    };
+
+                    // 建立 JSONP script
+                    script.src = `${this.googleApiUrl}?action=get&callback=${callbackName}`;
+                    script.async = true;
+                    document.body.appendChild(script);
+                }
+
+            }
+        });
+    </script>
+
+</body>
+
+</html>

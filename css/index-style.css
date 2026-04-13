@@ -1,3 +1,13 @@
+:root {
+    --bg: #fbf7ee;
+    --accent: #3e5477;
+    --beige: #e6d5bf;
+    --text: #3e5477;
+    --muted: #9aa3b1;
+    --hole: #c9b89e;
+    --hole-shadow: #a8957c;
+}
+
 /* scrollTop */
 .arrow-up {
     position: fixed;
@@ -669,10 +679,12 @@
 
 
 .section-area.area3 .item p {
-    font-size: 16px;
     letter-spacing: 2px;
     color: #fff;
     font-family: 'SourceHanSansSC-Light';
+    font-size: 15px;
+    letter-spacing: 2px;
+    margin-bottom: 0px;
 }
 
 .section-area.area3 .item p+p {
@@ -950,11 +962,13 @@
 }
 
 .section-area.area6 .item p {
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 2px;
     color: #3e5477;
     font-family: 'SourceHanSansSC-Light';
     margin-top: 40px;
+    margin-bottom: 0px;
+    line-height: 2;
 }
 
 .section-area.area6 .item span {
@@ -1313,6 +1327,11 @@
     background: #fbf7ee;
 }
 
+.section-area.area11 .map-link {
+    background-color: #3e5477;
+    color: #fff;
+}
+
 .section-area.area11 .item {
     text-align: center;
 }
@@ -1324,7 +1343,6 @@
     padding: 30px 0;
     color: #000;
     font-family: SourceHanSansSC-Light;
-    font-weight: bold;
     margin-bottom: 0px;
     line-height: 2;
 }
@@ -1385,10 +1403,12 @@
 }
 
 .section-area.area11 p {
+    font-size: 15px;
     letter-spacing: 2px;
     color: #000;
-    font-size: 16px;
-    font-family: 'SourceHanSansSC-Light';
+    font-family: SourceHanSansSC-Light;
+    margin-bottom: 0px;
+    line-height: 2;
 }
 
 @media (min-width: 1200px) {
@@ -1416,7 +1436,12 @@
 }
 
 .section-area.area11 ul li {
-    letter-spacing: auto;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: #000;
+    font-family: SourceHanSansSC-Light;
+    margin-bottom: 0px;
+    line-height: 2;
 }
 
 .section-area.area11 ul li+li {
@@ -1753,9 +1778,11 @@
     padding: 50px 0;
     text-align: center;
     color: rgb(255, 255, 255);
-    font-family: SourceHanSansSC-Light;
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 2px;
+    font-family: SourceHanSansSC-Light;
+    margin-bottom: 0px;
+    line-height: 2;
 }
 
 @media (min-width: 1200px) {
@@ -1833,3 +1860,62 @@
 }
 
 /* --End area--------------- */
+
+
+/* 排行榜 */
+.leaders {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(230, 213, 191, 0.5);
+    padding: 12px;
+    border-radius: 12px;
+    /* max-height: 400px; */
+    overflow-y: auto;
+}
+
+.leaders-title {
+    font-family: SourceHanSansSC-Light;
+    font-size: 1.3rem;
+    color: var(--accent);
+}
+
+.leader-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(230, 213, 191, 0.3);
+    font-size: 0.85rem;
+}
+
+.leader-rank {
+    font-family: SourceHanSansSC-Light;
+    color: var(--beige);
+    font-size: 1rem;
+    width: 28px;
+    text-align: center;
+}
+
+.leader-score {
+    font-family: SourceHanSansSC-Light;
+    color: var(--accent);
+    font-size: 1.1rem;
+}
+
+.section-area.area9 .btn-send {
+    background-color: #3e5477;
+    color: #fff;
+}
+
+.section-area.area9 .text-game {
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 30px 0;
+    color: #000;
+    font-family: SourceHanSansSC-Light;
+    margin-bottom: 0px;
+    line-height: 2;
+}
