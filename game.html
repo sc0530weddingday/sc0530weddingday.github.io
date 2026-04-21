@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>婚禮熱身小遊戲</title>
-    <link rel="shortcut icon" href="img/game/game/3.webp" type="image/x-icon">
+    <link rel="shortcut icon" href="img/game/3.webp" type="image/x-icon">
     <meta name="description" content="50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！">
 
     <meta property="og:title" content="婚禮熱身小遊戲">
@@ -14,7 +14,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:site_name" content="婚禮熱身小遊戲">
-    <meta property="og:image" content="img/game/game/3.webp">
+    <meta property="og:image" content="img/game/3.webp">
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
@@ -93,6 +93,7 @@
                             <div>• 貓咪-1分</div>
                             <div class="pt-2">使用手機體驗較佳</div>
                         </div>
+
                         <div class="board" style="position:relative;">
                             <!-- 開始遮罩 -->
                             <div v-if="!running && !paused" class="board-overlay" @click.prevent @touchstart.prevent>
@@ -177,6 +178,12 @@
                     gridSize: 9,
                     holes: Array.from({ length: 9 }),
                     moles: [], // [{ idx, img }, ...] 支援多隻地鼠
+                    recentHits: [], // 記錄最近命中時間戳，用來計算連擊加速
+                    lastBadSpawnTime: 0,  // 上次生成貓咪的時間
+                    lastGoodSpawnTime: 0, // 上次生成惡魔的時間
+                    devilCount: 0,  // 本局出現惡魔總數
+                    catCount: 0,    // 本局出現貓咪總數
+                    minDevils: 65,  // ★ 每局最少出現惡魔數，可自行調整
                     lures: [], // [{ idx, color, id }, ...] 獨立誘導框
                     lureTimerId: null,
                     hitIndex: null,
@@ -285,6 +292,11 @@
                     this.score = 0;
                     this.timeLeft = 50;
                     this.moles = [];
+                    this.recentHits = [];
+                    this.lastBadSpawnTime = Date.now();
+                    this.lastGoodSpawnTime = Date.now();
+                    this.devilCount = 0;
+                    this.catCount = 0;
                     this.hitIndex = null;
                     this.clearTimers();
                     this.startTimers();
@@ -325,18 +337,29 @@
                 },
                 scheduleNextMole() {
                     const elapsed = 50 - this.timeLeft;
-                    // 速度：620ms → 280ms（隨時間縮短）
-                    const delay = Math.max(280, 620 - elapsed * 7) + Math.random() * 150;
-                    // 最多幾隻：前 20 秒 1 隻，之後 2 隻
-                    const maxMoles = elapsed >= 20 ? 2 : 1;
-                    // 壞牛比例：25% → 50%
-                    const badChance = Math.min(0.5, 0.25 + elapsed * 0.005);
+                    // 清除 2 秒前的連擊記錄
+                    const now = Date.now();
+                    this.recentHits = this.recentHits.filter(t => now - t < 2000);
+                    // 每個近期連擊縮短 25ms，最多加速 150ms
+                    const comboBonus = Math.min(150, this.recentHits.length * 25);
+                    // 速度：回調，620ms → 150ms
+                    const delay = Math.max(150, 620 - elapsed * 8 - comboBonus) + Math.random() * 120;
+                    // 最多幾隻 & 壞牛比例：依 5/25/35/45 秒分四段
+                    const comboExtra = Math.floor(this.recentHits.length / 3);
+                    let baseMoles, badChance;
+                    if (elapsed >= 45) { baseMoles = 3; badChance = 0.50; }
+                    else if (elapsed >= 35) { baseMoles = 3; badChance = 0.45; }
+                    else if (elapsed >= 25) { baseMoles = 3; badChance = 0.40; }
+                    else if (elapsed >= 5) { baseMoles = 2; badChance = 0.35; }
+                    else { baseMoles = 2; badChance = 0.25; }
+                    const maxMoles = Math.min(5, baseMoles + comboExtra);
 
                     this.moleTimerId = setTimeout(() => {
                         if (this.running && !this.paused) {
-                            // 超過上限時移除最舊的
+                            // 超過上限時移除最舊的（同時清掉它的自動消失計時器）
                             while (this.moles.length >= maxMoles) {
-                                this.moles.shift();
+                                const old = this.moles.shift();
+                                if (old && old.timerId) clearTimeout(old.timerId);
                             }
 
                             // 選一個沒被佔用的格子
@@ -347,8 +370,38 @@
                                 tries++;
                             } while (occupied.includes(idx) && tries < 20);
 
-                            const img = Math.random() < badChance ? './img/game/1.webp' : './img/game/2.webp';
-                            this.moles.push({ idx, img });
+                            const now2 = Date.now();
+                            const timeSinceLastBad = now2 - this.lastBadSpawnTime;
+                            const timeSinceLastGood = now2 - this.lastGoodSpawnTime;
+                            let img;
+                            if (timeSinceLastGood > 2000) {
+                                img = './img/game/2.webp'; // 超過2秒沒惡魔，強制出惡魔
+                            } else if (timeSinceLastBad > 2000) {
+                                img = './img/game/1.webp'; // 超過2秒沒貓咪，強制出貓咪
+                            } else {
+                                // 方案B：追蹤實際比例，動態修正趨向目標
+                                const total = this.devilCount + this.catCount;
+                                const actualCatRatio = total > 5 ? this.catCount / total : badChance;
+                                const correction = (badChance - actualCatRatio) * 0.8;
+                                let adjustedChance = Math.max(0.05, Math.min(0.95, badChance + correction));
+                                // 進度落後時輕微壓低貓咪機率
+                                const expectedDevils = (elapsed / 50) * this.minDevils;
+                                if (this.devilCount < expectedDevils) {
+                                    const deficit = expectedDevils - this.devilCount;
+                                    adjustedChance = Math.max(0.05, adjustedChance - deficit * 0.05);
+                                }
+                                img = Math.random() < adjustedChance ? './img/game/1.webp' : './img/game/2.webp';
+                            }
+                            if (img === './img/game/1.webp') { this.lastBadSpawnTime = now2; this.catCount++; }
+                            else { this.lastGoodSpawnTime = now2; this.devilCount++; }
+                            // 存活時間：隨遊戲進行縮短（900ms → 500ms）
+                            const lifetime = Math.max(500, 900 - elapsed * 8) + Math.random() * 200;
+                            const moleId = Date.now() + Math.random();
+                            const moleTimerId = setTimeout(() => {
+                                const i = this.moles.findIndex(m => m.id === moleId);
+                                if (i !== -1) this.moles.splice(i, 1);
+                            }, lifetime);
+                            this.moles.push({ idx, img, id: moleId, timerId: moleTimerId });
                             this.scheduleNextMole();
                         } else if (this.paused) {
                             this.moleTimerId = null;
@@ -402,13 +455,15 @@
                     const moleIdx = this.moles.findIndex(m => m.idx === idx);
                     if (moleIdx === -1) return;
 
-                    const img = this.moles[moleIdx].img;
+                    const mole = this.moles[moleIdx];
+                    const img = mole.img;
                     if (img === './img/game/3.webp') return; // 動畫中，忽略重複點擊
+                    clearTimeout(mole.timerId); // 清掉自動消失計時器
                     this.hitIndex = idx;
                     this.hitType = (img === './img/game/1.webp') ? 'minus' : 'plus';
 
                     if (img === './img/game/1.webp') {
-                        // 壞牛：先變 3.webp，300ms 後移除
+                        // 貓咪：扣分
                         this.moles.splice(moleIdx, 1, { idx, img: './img/game/3.webp' });
                         this.score = Math.max(0, this.score - 1);
                         this.playSound('miss');
@@ -418,9 +473,10 @@
                             this.hitIndex = null;
                         }, 300);
                     } else {
-                        // 好牛：直接移除
+                        // 惡魔：+1分
                         this.moles.splice(moleIdx, 1);
                         this.score += 1;
+                        this.recentHits.push(Date.now());
                         this.playSound('hit');
                         setTimeout(() => { this.hitIndex = null; }, 300);
                     }
@@ -429,6 +485,7 @@
                 endGame() {
                     this.clearTimers();
                     this.running = false;
+                    this.moles.forEach(m => { if (m.timerId) clearTimeout(m.timerId); });
                     this.moles = [];
                     this.lures = [];
                     this.hitIndex = null;
