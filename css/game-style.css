@@ -356,6 +356,18 @@ body::before {
     font-size: 1.1rem;
 }
 
+.leader-top5 {
+    background: rgba(200, 168, 75, 0.12);
+    border-color: rgba(200, 168, 75, 0.4);
+    color: #b8860b;
+}
+
+.leader-top5 .leader-rank,
+.leader-top5 .leader-score {
+    color: #c8a84b;
+}
+
+
 /* 結算 Modal */
 .modal-custom {
     background: #fbf7ee;

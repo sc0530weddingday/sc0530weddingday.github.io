@@ -356,11 +356,12 @@
                         <div class="leaders">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="leaders-title">排行榜</div>
-                                <div class="stat-label">前 5 名</div>
+                                <div class="stat-label">前 10 名</div>
                             </div>
                             <div v-if="highscores.length===0" style="font-size:0.82rem;opacity:0.55;">尚無紀錄，開始遊戲取得高分 ♡
                             </div>
-                            <div v-for="(h,i) in highscores" :key="h.phone" class="leader-item">
+                            <div v-for="(h,i) in highscores" :key="h.phone" class="leader-item"
+                                :class="i < 5 ? 'leader-top5' : ''">
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="leader-rank">{{i+1}}</div>
                                     <div>
@@ -984,8 +985,10 @@
             },
             mounted() {
                 const showApp = () => {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('app-game').style.display = 'block';
+                    const loader = document.getElementById('loading');
+                    const app = document.getElementById('app');
+                    if (loader) loader.style.display = 'none';
+                    if (app) app.style.display = 'block';
                 };
                 if (document.readyState === 'complete') {
                     showApp();
@@ -1007,19 +1010,17 @@
                     const script = document.createElement('script');
 
                     window[callbackName] = (data) => {
-                        this.highscores = Array.isArray(data) ? data : (data.scores || []);
-                        this.loading = false;
+                        data.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
+                        this.highscores = data.slice(0, this.topN); // 更新排行榜
 
+                        // 清理
                         delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
+                        if (script.parentNode) {
+                            script.parentNode.removeChild(script);
+                        }
                     };
 
-                    script.onerror = () => {
-                        this.loading = false;
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                    };
-
+                    // 建立 JSONP script
                     script.src = `${this.googleApiUrl}?action=get&callback=${callbackName}`;
                     script.async = true;
                     document.body.appendChild(script);

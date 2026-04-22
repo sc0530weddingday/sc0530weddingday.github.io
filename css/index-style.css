@@ -1919,3 +1919,14 @@
     margin-bottom: 0px;
     line-height: 2;
 }
+
+.leader-top5 {
+    background: rgba(200, 168, 75, 0.12);
+    border-color: rgba(200, 168, 75, 0.4);
+    color: #b8860b;
+}
+
+.leader-top5 .leader-rank,
+.leader-top5 .leader-score {
+    color: #c8a84b;
+}
