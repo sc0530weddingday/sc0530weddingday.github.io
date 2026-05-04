@@ -8,4 +8,4 @@ const firebaseConfig = {
   measurementId: "G-6XKL8QK85Z"
 };
 
-const GITHUB_PAGES_URL = "https://sc0530weddingday.github.io/upload";
+const GITHUB_PAGES_URL = "https://sc0530weddingday.github.io/";
