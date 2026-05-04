@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sean & Cindy 0530 Wedding Day | 照片牆</title>
+    <meta name="description" content="掃描QRCode上傳照片，與Sean & Cindy一同分享婚禮的歡樂時光！">
+
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+
+    <meta property="og:title" content="Sean & Cindy 0530 Wedding Day">
+    <meta property="og:description" content="掃描QRCode上傳照片，與Sean & Cindy一同分享婚禮的歡樂時光！">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="Sean & Cindy 0530 Wedding Day | 照片牆">
+    <meta property="og:image" content="img/og-img.webp">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* ── 字體（整合時換成 @font-face） ── */
+        :root {
+            --font-title: 'Marcellus-Regular', 'Georgia', serif;
+            --font-script: 'parfumerie-script-old-style', cursive;
+            --font-body: 'optima-lt-pro-roman', 'Optima', sans-serif;
+            --font-zh: 'SourceHanSerifTC-Light', serif;
+
+            --color-bg: #1c1e24;
+            --color-cream: #e6d5bf;
+            --color-gold: #c9b89e;
+            --color-blue: #3f6594;
+            --color-navy: #3e5477;
+            --color-muted: rgba(154, 163, 177, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--color-bg);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-body);
+        }
+
+        /* ── 輪播 ── */
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+        }
+
+        /* ── 暗角 ── */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(20, 18, 16, 0.65) 100%);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* ── 空狀態 ── */
+        .empty-state {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: var(--color-bg);
+        }
+
+        .empty-state .script {
+            font-family: var(--font-script);
+            font-size: 3rem;
+            color: var(--color-cream);
+        }
+
+        .empty-state .hint {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            color: var(--color-muted);
+            text-transform: uppercase;
+        }
+
+        /* ── 頂部列 ── */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(20, 18, 16, 0.55), transparent);
+        }
+
+        .top-bar .couple {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            letter-spacing: 5px;
+            color: var(--color-cream);
+            text-transform: uppercase;
+        }
+
+        .top-bar .counter {
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: var(--color-cream);
+            background: rgba(62, 84, 119, 0.35);
+            border: 1px solid rgba(62, 84, 119, 0.6);
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+
+        /* ── QR 右下角 ── */
+        .qr-corner {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .qr-wrap {
+            background: rgba(230, 213, 191, 0.95);
+            border-radius: 10px;
+            padding: 8px;
+        }
+
+        .qr-corner p {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--color-muted);
+            text-transform: uppercase;
+        }
+
+        /* ── 日期標記 ── */
+        .date-tag {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: rgba(154, 163, 177, 0.6);
+            z-index: 10;
+        }
+
+        /* ── 進度條 ── */
+        .progress-bar-slide {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--color-blue);
+            opacity: 0.8;
+            z-index: 10;
+            transition: width linear;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="vignette"></div>
+
+        <!-- 空狀態 -->
+        <div v-if="photos.length === 0" class="empty-state">
+            <div class="script">Sean &amp; Cindy</div>
+            <div class="hint">Scan QR Code to upload your photo</div>
+        </div>
+
+        <!-- 輪播照片 -->
+        <div v-for="(photo, i) in photos" :key="photo.id" class="slide" :class="{ active: i === currentIndex }">
+            <img v-if="shouldLoad(i)" :src="photo.url" :alt="photo.name" />
+        </div>
+
+        <!-- 頂部列 -->
+        <div class="top-bar" v-if="photos.length > 0">
+            <div class="couple">Sean &amp; Cindy</div>
+            <div class="counter">{{ currentIndex + 1 }} &nbsp;/&nbsp; {{ photos.length }}</div>
+        </div>
+
+        <!-- 進度條 -->
+        <div v-if="photos.length > 0" class="progress-bar-slide"
+            :style="{ width: barWidth + '%', transitionDuration: barDuration + 'ms' }">
+        </div>
+
+        <!-- 日期 -->
+        <div class="date-tag">2026 &nbsp;·&nbsp; 05 &nbsp;·&nbsp; 30</div>
+
+        <!-- QR Code -->
+        <div class="qr-corner">
+            <div class="qr-wrap">
+                <div id="qrcode"></div>
+            </div>
+            <p>Upload Photo</p>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <script>
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const uploadURL = GITHUB_PAGES_URL + '/upload.html';
+        const INTERVAL = 5000;
+
+        new Vue({
+            el: '#app',
+            data: {
+                photos: [],
+                currentIndex: 0,
+                knownIds: new Set(),
+                timer: null,
+                barWidth: 0,
+                barDuration: 0
+            },
+            mounted() {
+                new QRCode(document.getElementById('qrcode'), {
+                    text: uploadURL,
+                    width: 90,
+                    height: 90,
+                    colorDark: '#2d2520',
+                    colorLight: '#f0e8dc'
+                });
+
+                db.collection('photos')
+                    .orderBy('uploadedAt', 'asc')
+                    .onSnapshot(snapshot => {
+                        snapshot.docChanges().forEach(change => {
+                            if (change.type === 'added') {
+                                const data = change.doc.data();
+                                this.photos.push({
+                                    id: change.doc.id,
+                                    url: data.url,
+                                    name: data.name || '',
+                                    uploadedAt: data.uploadedAt
+                                });
+                                this.knownIds.add(change.doc.id);
+                            } else if (change.type === 'removed') {
+                                const idx = this.photos.findIndex(p => p.id === change.doc.id);
+                                if (idx !== -1) this.photos.splice(idx, 1);
+                                if (this.currentIndex >= this.photos.length) this.currentIndex = 0;
+                            }
+                        });
+
+                        if (this.photos.length > 0 && !this.timer) this.startSlideshow();
+                    });
+            },
+            methods: {
+                startSlideshow() {
+                    this.runProgress();
+                    this.timer = setInterval(() => {
+                        this.currentIndex = (this.currentIndex + 1) % this.photos.length;
+                        this.runProgress();
+                    }, INTERVAL);
+                },
+                runProgress() {
+                    this.barWidth = 0;
+                    this.barDuration = 0;
+                    this.$nextTick(() => {
+                        this.barDuration = INTERVAL;
+                        this.barWidth = 100;
+                    });
+                },
+                shouldLoad(i) {
+                    const next = (this.currentIndex + 1) % this.photos.length;
+                    return i === this.currentIndex || i === next;
+                }
+            },
+            beforeDestroy() {
+                if (this.timer) clearInterval(this.timer);
+            }
+        });
+    </script>
+</body>
+
+</html>
