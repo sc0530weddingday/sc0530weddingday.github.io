@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>打敗餓魔喵</title>
     <link rel="shortcut icon" href="img/game/3.webp" type="image/x-icon">
-    <meta name="description" content="50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！">
+    <meta name="description" content="50秒內擊敗所有餓魔，超越我們的紀錄衝上排行榜！">
 
     <meta property="og:title" content="打敗餓魔喵">
-    <meta property="og:description" content="50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！">
+    <meta property="og:description" content="50秒內擊敗所有餓魔，超越我們的紀錄衝上排行榜！">
     <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:site_name" content="打敗餓魔喵">
@@ -88,8 +88,8 @@
                     <!-- Left: Game Board -->
                     <div class="col-lg-7">
                         <div class="info mb-2 p-2">
-                            <div>50秒內擊敗所有惡魔，超越我們的紀錄衝上排行榜！</div>
-                            <div class="pt-2">• <img style="width:50px;" src="img/game/2.webp"> 惡魔+1分 (小心不要打到貓咪啦)</div>
+                            <div>50秒內擊敗所有餓魔，超越我們的紀錄衝上排行榜！</div>
+                            <div class="pt-2">• <img style="width:50px;" src="img/game/2.webp"> 餓魔+1分 (小心不要打到貓咪啦)</div>
                             <div class="pt-2">• <img style="width:50px;" src="img/game/1.webp"> 貓咪-1分</div>
                             <div class="pt-2">使用手機體驗較佳</div>
                         </div>
@@ -181,10 +181,10 @@
                     moles: [], // [{ idx, img }, ...] 支援多隻地鼠
                     recentHits: [], // 記錄最近命中時間戳，用來計算連擊加速
                     lastBadSpawnTime: 0,  // 上次生成貓咪的時間
-                    lastGoodSpawnTime: 0, // 上次生成惡魔的時間
-                    devilCount: 0,  // 本局出現惡魔總數
+                    lastGoodSpawnTime: 0, // 上次生成餓魔的時間
+                    devilCount: 0,  // 本局出現餓魔總數
                     catCount: 0,    // 本局出現貓咪總數
-                    minDevils: 63,  // ★ 每局最少出現惡魔數，可自行調整
+                    minDevils: 63,  // ★ 每局最少出現餓魔數，可自行調整
                     lures: [], // [{ idx, color, id }, ...] 獨立誘導框
                     lureTimerId: null,
                     hitIndex: null,
@@ -376,7 +376,7 @@
                             const timeSinceLastGood = now2 - this.lastGoodSpawnTime;
                             let img;
                             if (timeSinceLastGood > 2000) {
-                                img = './img/game/2.webp'; // 超過2秒沒惡魔，強制出惡魔
+                                img = './img/game/2.webp'; // 超過2秒沒餓魔，強制出餓魔
                             } else if (timeSinceLastBad > 2000) {
                                 img = './img/game/1.webp'; // 超過2秒沒貓咪，強制出貓咪
                             } else {
@@ -474,7 +474,7 @@
                             this.hitIndex = null;
                         }, 300);
                     } else {
-                        // 惡魔：+1分
+                        // 餓魔：+1分
                         this.moles.splice(moleIdx, 1);
                         this.score += 1;
                         this.recentHits.push(Date.now());
