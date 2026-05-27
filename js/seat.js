@@ -148,6 +148,64 @@ new Vue({
             }
         },
 
+        initMagnifier() {
+            const wrap      = document.getElementById('seat-magnifier-wrap');
+            const overlay   = document.getElementById('seat-zoom-overlay');
+            const closeBtn  = document.getElementById('seat-zoom-close');
+            const scrollEl  = document.getElementById('seat-zoom-scroll');
+            if (!wrap || !overlay || !scrollEl) return;
+
+            const isTouch = ('ontouchstart' in window);
+
+            // 拖移變數（桌機用）
+            let dragging = false, startX, startY, sLeft, sTop;
+            const onDown = (e) => {
+                if (e.target === closeBtn) return;
+                dragging = true;
+                startX = e.clientX; startY = e.clientY;
+                sLeft = overlay.scrollLeft; sTop = overlay.scrollTop;
+                overlay.style.cursor = 'grabbing';
+                e.preventDefault();
+            };
+            const onMove = (e) => {
+                if (!dragging) return;
+                overlay.scrollLeft = sLeft - (e.clientX - startX);
+                overlay.scrollTop  = sTop  - (e.clientY - startY);
+            };
+            const onUp = () => { dragging = false; overlay.style.cursor = 'grab'; };
+
+            const close = () => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = '';
+                overlay.style.cursor = '';
+                overlay.removeEventListener('mousedown', onDown);
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup',   onUp);
+            };
+
+            const open = () => {
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                overlay.scrollLeft = 0;
+                overlay.scrollTop  = 0;
+                if (!isTouch) {
+                    scrollEl.style.width = '130vw'; // 桌機較小
+                    overlay.style.cursor = 'grab';
+                    overlay.addEventListener('mousedown', onDown);
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup',   onUp);
+                } else {
+                    scrollEl.style.width = '280vw'; // 手機較大
+                }
+            };
+
+            if (wrap._tapOpen) wrap.removeEventListener('click', wrap._tapOpen);
+            wrap._tapOpen = open;
+            wrap.addEventListener('click', open);
+            closeBtn.onclick = close;
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        },
+
         closeModal() {
             this.showModal = false;
         },
@@ -155,6 +213,13 @@ new Vue({
         handleEsc(event) {
             if (event.key === 'Escape' && this.showModal) {
                 this.closeModal();
+            }
+        }
+    },
+    watch: {
+        modalState(val) {
+            if (val === 'success') {
+                this.$nextTick(() => { this.initMagnifier(); });
             }
         }
     },

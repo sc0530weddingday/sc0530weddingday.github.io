@@ -1930,3 +1930,65 @@
 .leader-top5 .leader-score {
     color: #c8a84b;
 }
+
+/* 座位圖全螢幕（手機） */
+#seat-zoom-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+#seat-zoom-scroll {
+    width: 280vw;
+    padding: 48px 0 24px;
+}
+#seat-zoom-scroll img {
+    display: block;
+    width: 100%;
+    max-width: none;
+}
+#seat-zoom-close {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10000;
+}
+.magnifier-wrap .zoom-hint {
+    text-align: center;
+    font-size: 0.78rem;
+    opacity: 0.5;
+    margin-top: 4px;
+}
+
+/* 座位圖放大鏡 */
+.magnifier-wrap {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.magnifier-lens {
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 2px solid rgba(62, 84, 119, 0.4);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+    pointer-events: none;
+    display: none;
+    background-repeat: no-repeat;
+    z-index: 10;
+}

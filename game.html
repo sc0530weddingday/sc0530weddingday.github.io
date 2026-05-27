@@ -36,11 +36,15 @@
 
     <main>
         <audio id="bg-music" src="./sound/bg.mp3" loop autoplay></audio>
+        <audio id="game-start-sound" src="./sound/game-start.mp3" preload="auto"></audio>
+        <audio id="time-sound" src="./sound/time.mp3" preload="auto"></audio>
+        <audio id="over-sound" src="./sound/over.mp3" preload="none"></audio>
 
         <div id="loading" class="loading-screen">
             <div class="sub">Sean & Cindy</div>
             <div>Game is Loading<span class="loading-dots"></span></div>
             <div style="font-size:0.8rem;opacity:0.9;margin-top:4px;">♡ 建議開啟聲音遊玩 ♡</div>
+
         </div>
         <div id="app" class="panel">
             <div v-if="savingScore" class="loading-overlay">
@@ -89,9 +93,14 @@
                     <div class="col-lg-7">
                         <div class="info mb-2 p-2">
                             <div>50秒內擊敗所有餓魔，超越我們的紀錄衝上排行榜！</div>
+                            <div>前五名可以獲得精美小禮！</div>
+                            <div>分數相同者需當天現場進行PK賽！</div>
                             <div class="pt-2">• <img style="width:50px;" src="img/game/2.webp"> 餓魔+1分 (小心不要打到貓咪啦)</div>
                             <div class="pt-2">• <img style="width:50px;" src="img/game/1.webp"> 貓咪-1分</div>
                             <div class="pt-2">使用手機體驗較佳</div>
+                            <div class="text-small my-3">
+                                <a href="index.html" class="btn-wedding outline" style="text-decoration: none;">返回首頁</a>
+                            </div>
                         </div>
 
                         <div class="board" style="position:relative;">
@@ -145,6 +154,7 @@
                                 <div class="leader-score">{{h.score}}</div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -225,6 +235,7 @@
                 };
                 this.playSound = (name) => {
                     if (!this.audioCtx || !this.audioBuffers[name]) return;
+                    if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
                     const src = this.audioCtx.createBufferSource();
                     src.buffer = this.audioBuffers[name];
                     const gain = this.audioCtx.createGain();
@@ -269,6 +280,13 @@
                         bgAudio.loop = true;
                         bgAudio.play().catch(err => console.log('背景音樂播放被瀏覽器阻擋', err));
                     }
+                    // iOS 解鎖：在用戶點擊當下預先解鎖音效，over-sound 此時才開始載入
+                    ['over-sound', 'time-sound'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.load();
+                        el.play().then(() => { el.pause(); el.currentTime = 0; }).catch(() => { });
+                    });
                 },
                 // 倒數 3-2-1
                 beginCountdown() {
@@ -306,6 +324,7 @@
                 // 原本 startGame 改成呼叫倒數
                 startGame() {
                     this.startBackgroundMusic();
+                    const gs = document.getElementById('game-start-sound'); if (gs) { gs.currentTime = 0; gs.play().catch(() => { }); }
                     this.beginCountdown();
                 },
                 formatDate(dateStr) {
@@ -320,6 +339,8 @@
                     this.timerId = setInterval(() => {
                         if (!this.paused) {
                             this.timeLeft--;
+                            if (this.timeLeft === 25) { const bg = document.getElementById('bg-music'); if (bg) bg.pause(); const ov = document.getElementById('over-sound'); if (ov) { ov.volume = 0.5; ov.currentTime = 0; ov.play().catch(() => { }); } }
+                            if (this.timeLeft === 10) { const tm = document.getElementById('time-sound'); if (tm) { tm.volume = 0.5; tm.currentTime = 0; tm.play().catch(() => { }); } }
                             if (this.timeLeft <= 0) this.endGame();
                         }
                     }, 1000);
@@ -409,10 +430,20 @@
                         }
                     }, delay);
                 },
-                pauseGame() { this.paused = true; this.clearTimers(); },
-                resumeGame() { this.paused = false; this.startTimers(); },
+                pauseGame() {
+                    this.paused = true;
+                    this.clearTimers();
+                    const ov = document.getElementById('over-sound'); if (ov) ov.pause();
+                },
+                resumeGame() {
+                    this.paused = false;
+                    if (this.timeLeft <= 25) { const ov = document.getElementById('over-sound'); if (ov) ov.play().catch(() => { }); }
+                    this.startTimers();
+                },
                 restartGame() {
                     this.clearTimers();
+                    const ov = document.getElementById('over-sound'); if (ov) { ov.pause(); ov.currentTime = 0; }
+                    const bg = document.getElementById('bg-music'); if (bg) bg.play().catch(() => { });
                     this.moles = [];
                     this.lures = [];
                     this.hitIndex = null;
@@ -420,6 +451,7 @@
                     this.timeLeft = 50;
                     this.running = false;
                     this.paused = false;
+                    const gs = document.getElementById('game-start-sound'); if (gs) { gs.currentTime = 0; gs.play().catch(() => { }); }
                     this.beginCountdown();
                 },
                 getMole(idx) {
@@ -486,6 +518,8 @@
                 endGame() {
                     this.clearTimers();
                     this.running = false;
+                    const ov = document.getElementById('over-sound'); if (ov) { ov.pause(); ov.currentTime = 0; }
+                    const bg = document.getElementById('bg-music'); if (bg) bg.play().catch(() => { });
                     this.moles.forEach(m => { if (m.timerId) clearTimeout(m.timerId); });
                     this.moles = [];
                     this.lures = [];
@@ -525,6 +559,7 @@
                         } else {
                             updated.push(entry);
                         }
+                        updated.forEach(h => { if (h.date && !/^\d{4}/.test(h.date)) h.date = '2026/' + h.date; });
                         updated.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
                         this.highscores = updated.slice(0, this.topN);
                         this.showNameModal = false;
@@ -553,8 +588,16 @@
                     const script = document.createElement('script');
 
                     window[callbackName] = (data) => {
-                        data.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
-                        this.highscores = data.slice(0, this.topN); // 更新排行榜
+                        data.forEach(h => { if (h.date && !/^\d{4}/.test(h.date)) h.date = '2026/' + h.date; });
+                        // 每支電話只保留最高分（同分取較早的）
+                        const best = {};
+                        data.forEach(h => {
+                            const p = best[h.phone];
+                            if (!p || h.score > p.score || (h.score === p.score && new Date(h.date) < new Date(p.date))) best[h.phone] = h;
+                        });
+                        const deduped = Object.values(best);
+                        deduped.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
+                        this.highscores = deduped.slice(0, this.topN);
 
                         // 清理
                         delete window[callbackName];

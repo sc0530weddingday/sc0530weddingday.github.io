@@ -208,6 +208,17 @@ body::before {
     box-shadow: 0 6px 28px rgba(62, 84, 119, 0.45);
 }
 
+.btn-start.btn-back {
+    font-size: 0.8rem;
+    text-decoration: none;
+    box-shadow: none;
+    animation: none;
+}
+.btn-start.btn-back:hover,
+.btn-start.btn-back:active {
+    box-shadow: none;
+}
+
 @keyframes pulse-start {
 
     0%,

@@ -356,6 +356,8 @@
                     <div class="col-lg-6 ">
                         <div class="leaders info mb-2 p-3">
                             <div>50秒內擊敗所有餓魔，超越我們的紀錄衝上排行榜！</div>
+                            <div>前五名可以獲得精美小禮！</div>
+                            <div>分數相同者需當天現場進行PK賽！</div>
                             <div class="pt-2">• <img style="width:50px;" src="img/game/2.webp"> 餓魔+1分 (小心不要打到貓咪啦)</div>
                             <div class="pt-2">• <img style="width:50px;" src="img/game/1.webp"> 貓咪-1分</div>
                             <div class="pt-2">使用手機體驗較佳</div>
@@ -630,7 +632,7 @@
                     <div class="row justify-content-center py-5">
                         <div class="col-11 col-xl-8 py-lg-5  wow fadeInUp">
                             <div id="seat" class="row justify-content-center">
-                                <div class="col-12 mb-2">
+                                <div class="col-10 mb-2">
                                     <div class="input-group mb-3">
                                         <input type="text" class="form-control" placeholder="姓名"
                                             v-model.trim="form.name" @compositionstart="handleCompositionStart"
@@ -643,62 +645,43 @@
                                 </div>
 
                                 <transition name="fade">
-                                    <div v-if="showModal" class="modal-mask" @click.self="closeModal">
-                                        <div class="modal-wrap">
-                                            <button class="modal-close" type="button" @click="closeModal">×</button>
+                                    <div v-if="showModal" class="seat-result mt-3">
 
-                                            <div class="modal-header">
-                                                <h2 class="modal-title">
-                                                    <span v-if="modalState === 'loading'">查詢中</span>
-                                                    <span v-else-if="modalState === 'success'">查詢結果</span>
-                                                    <span v-else-if="modalState === 'error'">查詢結果</span>
-                                                </h2>
+                                        <template v-if="modalState === 'loading'">
+                                            <div class="loading-spinner"></div>
+                                            <div class="modal-message">正在查詢座位資訊，請稍候...</div>
+                                        </template>
+
+                                        <template v-else-if="modalState === 'success'">
+                                            <div class="result-item justify-content-center">
+                                                <div class="text-center">謝謝你的參與！17:00證婚不見不散♡</div>
                                             </div>
-
-                                            <div class="modal-body">
-                                                <template v-if="modalState === 'loading'">
-                                                    <div class="loading-spinner"></div>
-                                                    <div class="modal-message">正在查詢座位資訊，請稍候...</div>
-                                                </template>
-
-                                                <template v-else-if="modalState === 'success'">
-                                                    <div class="result-item justify-content-center">
-                                                        <div class="text-center">謝謝你的參與！17:00證婚不見不散♡</div>
-                                                    </div>
-                                                    <div class="result-item">
-                                                        <div class="result-label">姓名</div>
-                                                        <div class="result-value">：{{ result.name || '-' }}</div>
-                                                    </div>
-
-                                                    <div class="result-item">
-                                                        <div class="result-label">桌號</div>
-                                                        <div class="result-value">：{{ result.table || '-' }}</div>
-                                                    </div>
-
-                                                    <div class="result-item">
-                                                        <div class="result-label">座位</div>
-                                                        <div class="result-value">：{{ result.seat || '-' }}</div>
-                                                    </div>
-
-
-                                                    <!-- <div class="result-item">
-                                                        <div class="result-label">備註</div>
-                                                        <div class="result-value">：{{ result.note || '無' }}</div>
-                                                    </div> -->
-                                                </template>
-
-                                                <template v-else-if="modalState === 'error'">
-                                                    <div class="modal-message text-center text-danger">{{ modalMessage
-                                                        }}</div>
-                                                </template>
+                                            <div class="result-item">
+                                                <div class="result-label">姓名</div>
+                                                <div class="result-value">：{{ result.name || '-' }}</div>
                                             </div>
-
-                                            <div class="modal-footer">
-                                                <button class="modal-btn btn px-5" type="button" @click="closeModal">
-                                                    關閉
-                                                </button>
+                                            <div class="result-item">
+                                                <div class="result-label">桌號</div>
+                                                <div class="result-value">：{{ result.table || '-' }}</div>
                                             </div>
-                                        </div>
+                                            <!-- <div class="result-item">
+                                                <div class="result-label">座位</div>
+                                                <div class="result-value">：{{ result.seat || '-' }}</div>
+                                            </div> -->
+                                            <div class="pic-item">
+                                                <div class="magnifier-wrap" id="seat-magnifier-wrap">
+                                                    <div class="magnifier-lens" id="seat-magnifier-lens"></div>
+                                                    <img class="w-100" id="seat-img" src="img/seat.jpg" alt="座位圖"
+                                                        title="座位圖">
+                                                </div>
+                                                <div class="zoom-hint">點擊圖片放大查看</div>
+                                            </div>
+                                        </template>
+
+                                        <template v-else-if="modalState === 'error'">
+                                            <div class="modal-message text-center text-danger">{{ modalMessage }}</div>
+                                        </template>
+
                                     </div>
                                 </transition>
 
@@ -736,6 +719,14 @@
         </section>
         <section class="section-area area12  wow fadeIn"></section>
         <div id="import-footer"></div>
+
+        <!-- 座位圖全螢幕放大（手機用） -->
+        <div id="seat-zoom-overlay">
+            <div id="seat-zoom-close">✕</div>
+            <div id="seat-zoom-scroll">
+                <img src="img/seat.jpg" alt="座位圖">
+            </div>
+        </div>
 
         <div class="arrow-up">
             <div onclick="scrollToTop()">
@@ -986,6 +977,7 @@
             data() {
                 return {
                     highscores: [],
+                    topN: 10,
                     loading: true,
                     googleApiUrl: 'https://script.google.com/macros/s/AKfycbyhKZN-22We15mciytzTBkQNtapv_kTYqZFjk1KmMhcoiLXex-BvwLDxFzIzYJD5FXg/exec'
                 };
@@ -1020,8 +1012,16 @@
                     const script = document.createElement('script');
 
                     window[callbackName] = (data) => {
-                        data.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
-                        this.highscores = data.slice(0, this.topN); // 更新排行榜
+                        data.forEach(h => { if (h.date && !/^\d{4}/.test(h.date)) h.date = '2026/' + h.date; });
+                        // 每支電話只保留最高分（同分取較早的）
+                        const best = {};
+                        data.forEach(h => {
+                            const p = best[h.phone];
+                            if (!p || h.score > p.score || (h.score === p.score && new Date(h.date) < new Date(p.date))) best[h.phone] = h;
+                        });
+                        const deduped = Object.values(best);
+                        deduped.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
+                        this.highscores = deduped.slice(0, this.topN);
 
                         // 清理
                         delete window[callbackName];
