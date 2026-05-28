@@ -38,7 +38,6 @@
         <audio id="bg-music" src="./sound/bg.mp3" loop autoplay></audio>
         <audio id="game-start-sound" src="./sound/game-start.mp3" preload="auto"></audio>
         <audio id="time-sound" src="./sound/time.mp3" preload="auto"></audio>
-        <audio id="over-sound" src="./sound/over.mp3" preload="none"></audio>
 
         <div id="loading" class="loading-screen">
             <div class="sub">Sean & Cindy</div>
@@ -254,9 +253,15 @@
             mounted() {
                 const bgAudio = document.getElementById('bg-music');
                 if (bgAudio) {
-                    bgAudio.volume = 0.1; // 背景音樂小聲
+                    bgAudio.volume = 0.1;
                     bgAudio.loop = true;
-                    bgAudio.play().catch(err => console.log('背景音樂播放被瀏覽器阻擋', err));
+                    const tryPlay = () => {
+                        bgAudio.play().catch(() => { });
+                        ['click', 'touchstart', 'keydown'].forEach(e => document.removeEventListener(e, tryPlay));
+                    };
+                    bgAudio.play().catch(() => {
+                        ['click', 'touchstart', 'keydown'].forEach(e => document.addEventListener(e, tryPlay, { once: true }));
+                    });
                 }
                 // 模擬資源載入完成後再顯示主畫面
                 const showApp = () => {
@@ -280,8 +285,8 @@
                         bgAudio.loop = true;
                         bgAudio.play().catch(err => console.log('背景音樂播放被瀏覽器阻擋', err));
                     }
-                    // iOS 解鎖：在用戶點擊當下預先解鎖音效，over-sound 此時才開始載入
-                    ['over-sound', 'time-sound'].forEach(id => {
+                    // iOS 解鎖：在用戶點擊當下預先解鎖音效
+                    ['time-sound'].forEach(id => {
                         const el = document.getElementById(id);
                         if (!el) return;
                         el.load();
@@ -339,8 +344,7 @@
                     this.timerId = setInterval(() => {
                         if (!this.paused) {
                             this.timeLeft--;
-                            if (this.timeLeft === 25) { const bg = document.getElementById('bg-music'); if (bg) bg.pause(); const ov = document.getElementById('over-sound'); if (ov) { ov.volume = 0.5; ov.currentTime = 0; ov.play().catch(() => { }); } }
-                            if (this.timeLeft === 10) { const tm = document.getElementById('time-sound'); if (tm) { tm.volume = 0.5; tm.currentTime = 0; tm.play().catch(() => { }); } }
+                            if (this.timeLeft === 10) { const tm = document.getElementById('time-sound'); if (tm) { tm.volume = 0.3; tm.currentTime = 0; tm.play().catch(() => { }); } }
                             if (this.timeLeft <= 0) this.endGame();
                         }
                     }, 1000);
@@ -433,16 +437,13 @@
                 pauseGame() {
                     this.paused = true;
                     this.clearTimers();
-                    const ov = document.getElementById('over-sound'); if (ov) ov.pause();
                 },
                 resumeGame() {
                     this.paused = false;
-                    if (this.timeLeft <= 25) { const ov = document.getElementById('over-sound'); if (ov) ov.play().catch(() => { }); }
                     this.startTimers();
                 },
                 restartGame() {
                     this.clearTimers();
-                    const ov = document.getElementById('over-sound'); if (ov) { ov.pause(); ov.currentTime = 0; }
                     const bg = document.getElementById('bg-music'); if (bg) bg.play().catch(() => { });
                     this.moles = [];
                     this.lures = [];
@@ -518,7 +519,6 @@
                 endGame() {
                     this.clearTimers();
                     this.running = false;
-                    const ov = document.getElementById('over-sound'); if (ov) { ov.pause(); ov.currentTime = 0; }
                     const bg = document.getElementById('bg-music'); if (bg) bg.play().catch(() => { });
                     this.moles.forEach(m => { if (m.timerId) clearTimeout(m.timerId); });
                     this.moles = [];
