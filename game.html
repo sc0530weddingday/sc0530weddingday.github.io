@@ -255,13 +255,11 @@
                 if (bgAudio) {
                     bgAudio.volume = 0.1;
                     bgAudio.loop = true;
-                    const tryPlay = () => {
-                        bgAudio.play().catch(() => { });
-                        ['click', 'touchstart', 'keydown'].forEach(e => document.removeEventListener(e, tryPlay));
-                    };
-                    bgAudio.play().catch(() => {
-                        ['click', 'touchstart', 'keydown'].forEach(e => document.addEventListener(e, tryPlay, { once: true }));
-                    });
+                    const tryPlay = () => { bgAudio.play().catch(() => { }); };
+                    // 桌機直接播；手機等第一次觸碰/點擊再播
+                    tryPlay();
+                    document.addEventListener('touchstart', tryPlay, { once: true, passive: true });
+                    document.addEventListener('click', tryPlay, { once: true });
                 }
                 // 模擬資源載入完成後再顯示主畫面
                 const showApp = () => {
